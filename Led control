@@ -1,0 +1,39 @@
+//Receiver
+#include <SPI.h>                       // SPI Arayüzünü dahil ettik.
+#include "RF24.h"                      // RF24 kütüpanelerini dahil ettik.
+byte data[1];                          // Göndereceğimiz data değişkenini oluşturduk.
+boolean var;                           // Bit şeklinde var değişkeninini oluşturduk.
+const uint64_t pipe = 0xF0F0F0F0A1LL;  // Paralel veri yolu adresleri tanımlamasını yaptık.
+RF24 radio(10,9);                      // Modülün CE pinini 9.pin CS pinini de 10.pine bağlayacağımızı belirttik.
+
+void setup(){
+ pinMode(3, OUTPUT);                    // Arduino'nun 2.pinini çıkış olarak ayarladık.
+ pinMode(5, OUTPUT);                    // Arduino'nun 4.pinini çıkış olarak ayarladık.
+ pinMode(7, OUTPUT);                    // Arduino'nun 6.pinini çıkış olarak ayarladık.
+ radio.begin();                         // Kablosuz iletişimi başlattık.
+ radio.openReadingPipe(1,pipe);         // Veri alacağımız kanalın ID'sini tanımladık.
+ radio.startListening();                
+}
+
+void loop(){
+ if(radio.available()){
+   var = false;
+   while(!var){
+     radio.read(data, 1);   
+      if(data[0] == 0){
+      digitalWrite(3, LOW);
+      digitalWrite(5, LOW);
+      digitalWrite(7, LOW);
+      }
+      if(data[0] == 1){
+      digitalWrite(3, HIGH);
+      }
+      if(data[0] == 2){
+      digitalWrite(5, HIGH);
+      }
+      if(data[0] == 3){
+      digitalWrite(7, HIGH);
+   }
+  }
+ }
+}
